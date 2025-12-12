@@ -1,76 +1,25 @@
 import tkinter as tk
-from tkinter import messagebox,ttk
-from youtube import YoutubeScraper
-from datetime import datetime 
+from tkinter import ttk
+from datetime import datetime
 import os
 
-class YoutubeScraperApp:
+class TabApp:
     def __init__(self, root):
         self.root = root
+        self.root.title("Tab Navigation Example")
+        self.root.geometry("900x600")
+        
         # Header
-        header = tk.Frame(root, bg="#FF0000", height=100)
+        header = tk.Frame(root, bg="#2C3E50", height=60)
         header.pack(fill="x")
+        header.pack_propagate(False)
         
-        title = tk.Label(header, text="🎬 URILLL UNIVERSE", 
-                        font=("Arial", 26, "bold"), 
-                        bg="#FF0000", fg="white")
-        title.pack(pady=25)
-
-
-        # Input Frame
-        input_frame = tk.Frame(root, bg="#f5f5f5", pady=20)
-        input_frame.pack(fill="x")
+        tk.Label(header, text="📊 Dashboard", 
+                font=("Arial", 18, "bold"), 
+                bg="#2C3E50", fg="white").pack(side="left", padx=20, pady=15)
         
-        tk.Label(input_frame, text="YouTube URL:", 
-                font=("Arial", 11, "bold"), 
-                bg="#f5f5f5").pack(anchor="w", padx=25, pady=(0, 5))
-
-        # URL Entry with example
-        entry_container = tk.Frame(input_frame, bg="#f5f5f5")
-        entry_container.pack(fill="x", padx=25)
-
-        self.url_entry = tk.Entry(entry_container, font=("Arial", 11), 
-                                    relief="solid", bd=1)
-        self.url_entry.pack(fill="x", ipady=10,ipadx=20)
-        self.url_entry.insert(0,"https://www.youtube.com/watch?v=...")
-        self.url_entry.config(fg="gray")
-        self.url_entry.bind("<FocusIn>", self._clear_placeholder)
-        self.url_entry.bind("<FocusOut>", self._add_placeholder)
-        self.url_entry.bind("<Return>", lambda e: self.start_scraping())
-
-        # Example text
-        tk.Label(input_frame, 
-                text="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ", 
-                font=("Arial", 9), 
-                bg="#f5f5f5", 
-                fg="gray").pack(anchor="w", padx=25, pady=(3, 10))
-
-        # Buttons
-        btn_container = tk.Frame(input_frame, bg="#f5f5f5")
-        btn_container.pack(fill="x", padx=25)
-
-        self.scrape_btn = tk.Button(btn_container, 
-                                    text="🚀 Mulai Scraping", 
-                                    font=("Arial", 11, "bold"),
-                                    bg="#FF0000", fg="white", 
-                                    cursor="hand2",
-                                    command=self._start_scraping, 
-                                    relief="flat", 
-                                    padx=20, pady=10)
-        self.scrape_btn.pack(side="left", padx=(0, 10))
-
-        clear_btn = tk.Button(btn_container, 
-                            text="Clear Input", 
-                            font=("Arial", 11, "bold"),
-                            bg="#34495e", fg="white", 
-                            cursor="hand2",
-                            relief="flat",
-                            padx=20, pady=10,
-                            command=self._clear_input)
-        clear_btn.pack(side="left")
-
         # Tab Navigation
-        tab_frame = tk.Frame(root, height=30)
+        tab_frame = tk.Frame(root, bg="#34495E", height=50)
         tab_frame.pack(fill="x")
         tab_frame.pack_propagate(False)
         
@@ -78,17 +27,23 @@ class YoutubeScraperApp:
         
         # Tab Buttons
         self.logs_btn = tk.Button(tab_frame, text="📝 Logs", 
-                                    font=("Arial", 9, "bold"),
-                                    command=lambda: self.switch_tab("logs"),
-                                    padx=20, pady=10)
-        self.logs_btn.pack(side="left", padx=(0, 0), pady=0)
+                                  font=("Arial", 11, "bold"),
+                                  bg="#3498DB", fg="white",
+                                  cursor="hand2",
+                                  command=lambda: self.switch_tab("logs"),
+                                  relief="flat",
+                                  padx=20, pady=10)
+        self.logs_btn.pack(side="left", padx=(20, 5), pady=10)
         
         self.explorer_btn = tk.Button(tab_frame, text="📁 Explorer", 
-                                    font=("Arial", 9, "bold"),
-                                    command=lambda: self.switch_tab("explorer"),
-                                    padx=20, pady=10)
-        self.explorer_btn.pack(side="left", padx=0, pady=0)
-
+                                      font=("Arial", 11, "bold"),
+                                      bg="#34495E", fg="white",
+                                      cursor="hand2",
+                                      command=lambda: self.switch_tab("explorer"),
+                                      relief="flat",
+                                      padx=20, pady=10)
+        self.explorer_btn.pack(side="left", padx=5, pady=10)
+        
         # Main Content Area
         self.content_frame = tk.Frame(root, bg="white")
         self.content_frame.pack(fill="both", expand=True)
@@ -97,11 +52,13 @@ class YoutubeScraperApp:
         self.create_logs_tab()
         self.create_explorer_tab()
         
+        # Show logs tab by default
         self.switch_tab("logs")
-
+    
     def switch_tab(self, tab_name):
         self.current_tab = tab_name
         
+        # Update button styles
         if tab_name == "logs":
             self.logs_btn.config(bg="#3498DB")
             self.explorer_btn.config(bg="#34495E")
@@ -114,6 +71,7 @@ class YoutubeScraperApp:
             self.logs_frame.pack_forget()
     
     def create_logs_tab(self):
+        # Logs Tab - Single frame with log content
         self.logs_frame = tk.Frame(self.content_frame, bg="white")
         
         # Logs Header
@@ -153,9 +111,14 @@ class YoutubeScraperApp:
         scrollbar.config(command=self.logs_text.yview)
         
         # Add sample logs
+        self.add_log("INFO", "Application started")
         self.add_log("SUCCESS", "Connected to database")
+        self.add_log("WARNING", "High memory usage detected")
+        self.add_log("ERROR", "Failed to load configuration file")
+        self.add_log("INFO", "User logged in successfully")
     
     def create_explorer_tab(self):
+        # Explorer Tab - Split layout with sidebar and content
         self.explorer_frame = tk.Frame(self.content_frame, bg="white")
         
         # Explorer Header
@@ -193,21 +156,16 @@ class YoutubeScraperApp:
         folder_scrollbar.pack(side="right", fill="y")
         
         self.folder_listbox = tk.Listbox(folder_container,
-                                            font=("Arial", 12),
-                                            bg="#F8F9FA",
-                                            relief="flat",
-                                            selectmode=tk.SINGLE,
-                                            yscrollcommand=folder_scrollbar.set,
-                                            activestyle="none")
+                                         font=("Arial", 10),
+                                         bg="#F8F9FA",
+                                         relief="flat",
+                                         selectmode=tk.SINGLE,
+                                         yscrollcommand=folder_scrollbar.set,
+                                         activestyle="none")
         self.folder_listbox.pack(side="left", fill="both", expand=True)
         folder_scrollbar.config(command=self.folder_listbox.yview)
         self.folder_listbox.bind("<<ListboxSelect>>", self.on_folder_select)
         
-        folders=os.listdir("data")
-        for folder in folders:
-            if os.path.isdir(os.path.join("data", folder)):
-                self.folder_listbox.insert(tk.END, f"📁 {folder}")
-
         # RIGHT CONTENT - File List
         content_area = tk.Frame(explorer_container, bg="white")
         content_area.pack(side="right", fill="both", expand=True)
@@ -218,8 +176,8 @@ class YoutubeScraperApp:
         content_header.pack_propagate(False)
         
         self.content_title = tk.Label(content_header, text="📄 Files", 
-                                        font=("Arial", 11, "bold"), 
-                                        bg="#ECF0F1")
+                                      font=("Arial", 11, "bold"), 
+                                      bg="#ECF0F1")
         self.content_title.pack(side="left", padx=20, pady=10)
         
         # File List with scrollbar
@@ -230,40 +188,113 @@ class YoutubeScraperApp:
         file_scrollbar.pack(side="right", fill="y")
         
         self.file_listbox = tk.Listbox(file_container,
-                                        font=("Consolas", 10),
-                                        bg="white",
-                                        relief="solid",
-                                        bd=1,
-                                        selectmode=tk.SINGLE,
-                                        yscrollcommand=file_scrollbar.set,
-                                        activestyle="none")
+                                       font=("Consolas", 10),
+                                       bg="white",
+                                       relief="solid",
+                                       bd=1,
+                                       selectmode=tk.SINGLE,
+                                       yscrollcommand=file_scrollbar.set,
+                                       activestyle="none")
         self.file_listbox.pack(side="left", fill="both", expand=True)
         file_scrollbar.config(command=self.file_listbox.yview)
         
-        self.load_files("test")
+        # Initialize data folder and load folders
+        self.data_folder = "data"  # Path ke folder data
+        self.load_folders()
+    
+    def load_folders(self):
+        """Load folders from data directory"""
+        self.folder_listbox.delete(0, tk.END)
+        
+        # Check if data folder exists
+        if not os.path.exists(self.data_folder):
+            os.makedirs(self.data_folder)  # Create if doesn't exist
+            self.folder_listbox.insert(tk.END, "⚠️ Folder 'data' kosong")
+            return
+        
+        # Read all folders in data directory
+        try:
+            items = os.listdir(self.data_folder)
+            folders = [item for item in items if os.path.isdir(os.path.join(self.data_folder, item))]
+            
+            if folders:
+                for folder in sorted(folders):
+                    self.folder_listbox.insert(tk.END, f"📁 {folder}")
+            else:
+                self.folder_listbox.insert(tk.END, "⚠️ Tidak ada folder")
+        except Exception as e:
+            self.folder_listbox.insert(tk.END, f"❌ Error: {str(e)}")
     
     def on_folder_select(self, event):
         selection = self.folder_listbox.curselection()
         if selection:
             folder = self.folder_listbox.get(selection[0])
-            folder_name = folder.replace("📁 ", "")
+            # Remove emoji and get actual folder name
+            folder_name = folder.replace("📁 ", "").replace("⚠️ ", "").replace("❌ ", "")
+            
+            # Skip if it's an error/warning message
+            if folder_name in ["Folder 'data' kosong", "Tidak ada folder"] or "Error:" in folder_name:
+                return
+            
             self.load_files(folder_name)
     
     def load_files(self, folder_name):
         self.file_listbox.delete(0, tk.END)
         self.content_title.config(text=f"📄 Files in {folder_name}")
+        
+        # Real path to folder
+        folder_path = os.path.join(self.data_folder, folder_name)
+        
+        if not os.path.exists(folder_path):
+            self.file_listbox.insert(tk.END, "❌ Folder tidak ditemukan")
+            return
+        
         try:
-            folder_path = os.path.join("data", folder_name)
-            if os.path.exists(folder_path) and os.path.isdir(folder_path):
-                folder_files = os.listdir(folder_path)
-                for file in folder_files:
-                    file_path = os.path.join(folder_path, file)
-                    if os.path.isfile(file_path):
-                        self.file_listbox.insert(tk.END, f"📄 {file}")
+            items = os.listdir(folder_path)
+            files = [item for item in items if os.path.isfile(os.path.join(folder_path, item))]
+            
+            if files:
+                for file in sorted(files):
+                    # Add icon based on extension
+                    icon = self.get_file_icon(file)
+                    self.file_listbox.insert(tk.END, f"{icon} {file}")
             else:
-                pass
+                self.file_listbox.insert(tk.END, "⚠️ Folder kosong")
         except Exception as e:
-            print(f"Error loading files: {e}")
+            self.file_listbox.insert(tk.END, f"❌ Error: {str(e)}")
+    
+    def get_file_icon(self, filename):
+        """Return icon based on file extension"""
+        ext = os.path.splitext(filename)[1].lower()
+        
+        icon_map = {
+            '.txt': '📄',
+            '.pdf': '📄',
+            '.doc': '📄',
+            '.docx': '📄',
+            '.xls': '📊',
+            '.xlsx': '📊',
+            '.csv': '📊',
+            '.ppt': '📊',
+            '.pptx': '📊',
+            '.jpg': '🖼',
+            '.jpeg': '🖼',
+            '.png': '🖼',
+            '.gif': '🖼',
+            '.mp4': '🎬',
+            '.avi': '🎬',
+            '.mov': '🎬',
+            '.mp3': '🎵',
+            '.wav': '🎵',
+            '.zip': '📦',
+            '.rar': '📦',
+            '.py': '🐍',
+            '.js': '📜',
+            '.html': '🌐',
+            '.css': '🎨',
+        }
+        
+        return icon_map.get(ext, '📄')
     
     def add_log(self, level, message):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -277,6 +308,7 @@ class YoutubeScraperApp:
         }
         
         log_entry = f"[{timestamp}] [{level}] {message}\n"
+        
         self.logs_text.insert(tk.END, log_entry)
         self.logs_text.see(tk.END)
         
@@ -294,52 +326,7 @@ class YoutubeScraperApp:
         self.logs_text.delete(1.0, tk.END)
         self.add_log("INFO", "Logs cleared")
 
-
-    def _clear_placeholder(self, event):
-        if self.url_entry.get() == "https://www.youtube.com/watch?v=...":
-            self.url_entry.delete(0, tk.END)
-            self.url_entry.config(fg="black")
-    
-    def _add_placeholder(self, event):
-        if not self.url_entry.get():
-            self.url_entry.insert(0, "https://www.youtube.com/watch?v=...")
-            self.url_entry.config(fg="gray")
-    
-    def _clear_input(self):
-        self.url_entry.delete(0, tk.END)
-        self.url_entry.config(fg="black")
-        self.url_entry.focus()
-    
-    def _start_scraping(self):
-        url = self.url_entry.get().strip()
-        print(url)
-        if not url or url == "https://www.youtube.com/watch?v=...":
-            messagebox.showwarning("Peringatan", "Masukkan URL atau ID YouTube!")
-            return
-        # Disable button during scraping
-        self.scrape_btn.config(state="disabled", text="⏳ Scraping...")
-        
-        scraper = YoutubeScraper(url)
-        scraper.process()
-        
-        # Simulate scraping process
-        self.root.after(1500, lambda: self.finish_scraping(url))
-
-    def finish_scraping(self, url):
-        # Extract video ID (simplified)
-        video_id = url.split("v=")[-1].split("&")[0] if "v=" in url else url
-        
-        # Create filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"youtube_{video_id[:11]}_{timestamp}.csv"
-        
-        # Reset button
-        self.scrape_btn.config(state="normal", text="🚀 Mulai Scraping")
-        
-        # Clear input
-        self.url_entry.delete(0, tk.END)
-        
-        # self.update_footer()
-        
-        messagebox.showinfo("Sukses", f"Scraping selesai!")
-    
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TabApp(root)
+    root.mainloop()

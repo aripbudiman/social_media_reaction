@@ -54,7 +54,7 @@ class YoutubeScraper:
         print("\n🔄 Mengambil komentar...")
         comments = []
         nextPageToken = None
-        max_comments = 5000  # Batas maksimal komentar yang diambil
+        max_comments = 12000  # Batas maksimal komentar yang diambil
 
         while len(comments) < max_comments:
             try:
@@ -206,11 +206,11 @@ class YoutubeScraper:
         print("\n💾 Menyimpan data...")
 
         # Save semua data (raw)
-        df_raw.to_csv('data/youtube_comments_raw.csv', index=False, encoding='utf-8-sig')
+        df_raw.to_csv('data/raw/youtube_comments_raw.csv', index=False, encoding='utf-8-sig')
         print(f"✅ Raw data saved: youtube_comments_raw.csv ({len(df_raw)} comments)")
 
         # Save filtered data
-        df_filtered.to_csv('data/youtube_comments_filtered.csv', index=False, encoding='utf-8-sig')
+        df_filtered.to_csv('data/filtered/youtube_comments_filtered.csv', index=False, encoding='utf-8-sig')
         print(f"✅ Filtered data saved: youtube_comments_filtered.csv ({len(df_filtered)} comments)")
 
         # Save metadata video
@@ -230,7 +230,7 @@ class YoutubeScraper:
         }
         df_metadata = pd.DataFrame(video_metadata)
         df_metadata.to_json(
-            'data/youtube_video_metadata.json', 
+            'data/metadata/youtube_video_metadata.json', 
             orient='records',
             force_ascii=False,
             indent=2
