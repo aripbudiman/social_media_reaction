@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
+from config_window import ConfigWindow
 
 
 class Menubar:
@@ -31,6 +32,11 @@ class Menubar:
         )
         menubar.add_cascade(label="Help", menu=help_menu)
 
+        # Menu Configuration
+        config_menu = tk.Menu(menubar, tearoff=0)
+        config_menu.add_command(label="Settings", command=self.open_settings)
+        menubar.add_cascade(label="Configuration", menu=config_menu)
+
         # Pasang menu bar ke window
         root.config(menu=menubar)
 
@@ -44,3 +50,6 @@ class Menubar:
 
     def _exit_app(self):
         self.root.quit()
+
+    def open_settings(self):
+        ConfigWindow(self.root)
